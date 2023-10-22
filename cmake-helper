@@ -2,10 +2,10 @@
 
 usage() {
   echo "usage: cmake-helper <[-g][-c][-b][-r:target]>
--g          generate CMAKELists.txt
--c          delete build folder
--b          generate and build cmake files
--r <target> run target executable"
+  -g          generate CMAKELists.txt
+  -c          delete build folder
+  -b          generate and build cmake files
+  -r <target> run target executable"
 }
 
 generate-cmakelists() {
@@ -42,9 +42,9 @@ while getopts 'gcbr:' OPTION; do
       cmake -B "./build" -S "." && cmake --build "./build"  ;;
     r)
       ([[ -z "$OPTARG" ]] && usage) || ./build/"$OPTARG" ;;
-    *)
-      echo "Error: invalid option provided" && usage;;
-  esac
-done
+      *)
+        echo "Error: invalid option provided" && usage;;
+    esac
+  done
 
 
