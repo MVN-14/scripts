@@ -1,0 +1,14 @@
+#!/usr/bin/bash
+
+PORT=$1
+[[ -z "$PORT" ]] && (read -p "Enter a port number: " port; PORT=$port)
+
+DATA=$(netstat -tnlp | awk "/$PORT/ {print \$NF}")
+if [[ -z "$DATA" ]]; then echo "Couldnt find port $PORT"; exit; fi
+
+PNAME=$(echo $DATA | awk -F/ "{print \$2}")
+PID=$(echo $DATA | awk -F/ "{print \$1}")
+
+read -p "Force kill process $DATA using port $PORT? (y/N)" CHOICE;
+[[ "$CHOICE" == [Yy] ]] && kill -9 $PID
+

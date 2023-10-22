@@ -1,0 +1,50 @@
+#!/usr/bin/bash
+
+usage() {
+  echo "usage: cmake-helper <[-g][-c][-b][-r:target]>
+-g          generate CMAKELists.txt
+-c          delete build folder
+-b          generate and build cmake files
+-r <target> run target executable"
+}
+
+generate-cmakelists() {
+PROJECT_NAME=$1
+INCLUDE_DIR=$2
+SRC_DIR=$3
+[[ -z "$SRC_DIR" ]] && SRC_DIR="./src"
+[[ -z "$INCLUDE_DIR" ]] && INCLUDE_DIR="./include"
+
+printf "cmake_minimum_required(VERSION 3.0.0)
+project(%s VERSION 0.0.1)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+include_directories(%s)
+
+add_executable(\${PROJECT_NAME} %s/main.cpp)
+" $PROJECT_NAME $INCLUDE_DIR $SRC_DIR >> CMakeLists.txt
+}
+
+[[ -z "$1" ]] && usage
+
+while getopts 'gcbr:' OPTION; do
+  case "$OPTION" in
+    g)
+      read -p "Enter Project Name: " PROJECT_NAME
+      read -p "include dir: (/include): " INCLUDE_DIR
+      read -p "src dir: (/src): " SRC_DIR
+
+      generate-cmakelists $PROJECT_NAME $INCLUDE_DIR $SRC_DIR ;;
+    c)
+      [[ -d "./build" ]] && rm -rf "./build" && echo "Deleted ./build folder..." ;;
+    b)	
+      cmake -B "./build" -S "." && cmake --build "./build"  ;;
+    r)
+      ([[ -z "$OPTARG" ]] && usage) || ./build/"$OPTARG" ;;
+    *)
+      echo "Error: invalid option provided" && usage;;
+  esac
+done
+
+
