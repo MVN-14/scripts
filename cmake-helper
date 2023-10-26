@@ -9,21 +9,18 @@ usage() {
 }
 
 generate-cmakelists() {
-PROJECT_NAME=$1
-INCLUDE_DIR=$2
-SRC_DIR=$3
-[[ -z "$SRC_DIR" ]] && SRC_DIR="./src"
-[[ -z "$INCLUDE_DIR" ]] && INCLUDE_DIR="./include"
+  PROJECT_NAME=$1
+  INCLUDE_DIR=$2
+  SRC_DIR=$3
+  [[ -z "$SRC_DIR" ]] && SRC_DIR="."
+  [[ -n "$INCLUDE_DIR" ]] && INCLUDE_LINE="include_directories($INCLUDE_DIR)"
 
-printf "cmake_minimum_required(VERSION 3.0.0)
-project(%s VERSION 0.0.1)
+  printf "cmake_minimum_required(VERSION 3.0.0)
+project($PROJECT_NAME VERSION 0.0.1)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-include_directories(%s)
-
-add_executable(\${PROJECT_NAME} %s/main.cpp)
-" $PROJECT_NAME $INCLUDE_DIR $SRC_DIR >> CMakeLists.txt
+$INCLUDE_LINE
+add_executable(\${PROJECT_NAME} $SRC_DIR/main.cpp)" >> CMakeLists.txt
 }
 
 [[ -z "$1" ]] && usage
@@ -31,9 +28,9 @@ add_executable(\${PROJECT_NAME} %s/main.cpp)
 while getopts 'gcbr:' OPTION; do
   case "$OPTION" in
     g)
-      read -p "Enter Project Name: " PROJECT_NAME
-      read -p "include dir: (/include): " INCLUDE_DIR
-      read -p "src dir: (/src): " SRC_DIR
+      read -p "Enter Project Name (no spaces): " PROJECT_NAME
+      read -p "include dir (leave blank to use root): " INCLUDE_DIR
+      read -p "src dir (leave blank to use root): " SRC_DIR
 
       generate-cmakelists $PROJECT_NAME $INCLUDE_DIR $SRC_DIR ;;
     c)
